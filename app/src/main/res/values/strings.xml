@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MSI Decoder</string>
+    <string name="scan_barcode">Scan Barcode</string>
+    <string name="barcode_detected">Barcode détecté:</string>
+    <string name="no_barcode_detected">Aucun code-barres détecté</string>
+    <string name="camera_permission_required">Permission caméra requise</string>
+    <string name="grant_camera_permission">Accordez la permission caméra pour scanner</string>
+</resources>

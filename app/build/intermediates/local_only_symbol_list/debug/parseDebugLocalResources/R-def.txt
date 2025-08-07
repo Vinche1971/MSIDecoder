@@ -1,0 +1,29 @@
+R_DEF: Internal format may change without notice
+local
+color black
+color green
+color purple_200
+color purple_500
+color purple_700
+color red
+color teal_200
+color teal_700
+color white
+drawable scan_overlay
+id barcodeTypeText
+id barcodeValueText
+id phaseInfoText
+id previewView
+id resultContainer
+id scanOverlay
+id statusText
+layout activity_main
+string app_name
+string barcode_detected
+string camera_permission_required
+string grant_camera_permission
+string no_barcode_detected
+string scan_barcode
+style Theme.MSIDecoder
+xml backup_rules
+xml data_extraction_rules
