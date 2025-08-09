@@ -1,114 +1,112 @@
-# MSI Decoder - Android App
+# MSI Decoder (Android)
 
-Application Android pour décoder les codes-barres MSI (MSI Plessey) en adaptant l'algorithme Code39 de ZXing.
+Application Android simple pour scanner des codes-barres en temps réel avec CameraX et ML Kit. Le projet sert de base pour l’identification de codes (dont MSI) et l’affichage du type et de la valeur détectés.
 
-## 🎯 Objectif du Projet
+## Fonctionnalités
+- **Scan en temps réel**: flux caméra avec `CameraX` et analyse via `ImageAnalysis`.
+- **Détection ML Kit**: support de nombreux formats (QR, Code 128/39/93, Codabar, EAN-13/8, UPC-A/E, PDF417, Aztec, Data Matrix, ITF).
+- **UI claire**: `PreviewView` plein écran, overlay de cadrage, panneau de résultats.
+- **Callbacks structurés**: via `BarcodeResultListener`.
+- **Base pour MSI**: doc intégrée et emplacement prévu pour une phase MSI dédiée.
 
-Les codes MSI ne sont pas nativement supportés par Google MLKit. Ce projet vise à créer un décodeur MSI personnalisé en s'appuyant sur :
-- **MLKit** pour la détection d'images de codes-barres
-- **ZXing** comme base algorithmique (Code39 → MSI)
-- **Adaptation personnalisée** pour les spécificités MSI
+## Aperçu de l’architecture
+- `app/src/main/java/com/example/msidecoder/MainActivity.java`
+  - Gère la permission caméra, l’initialisation CameraX, le binding `Preview` + `ImageAnalysis`, et met à jour l’UI via `BarcodeResultListener`.
+- `app/src/main/java/com/example/msidecoder/scanner/BarcodeAnalyzer.java`
+  - Analyse chaque frame avec ML Kit (`BarcodeScanning`) et notifie les résultats.
+- `app/src/main/java/com/example/msidecoder/scanner/BarcodeResultListener.java`
+  - Contrat de callbacks: `onBarcodeDetected(type, value)` et `onNoBarcodeDetected()`.
+- `app/src/main/java/com/example/msidecoder/models/BarcodeResult.java`
+  - Modèle optionnel pour encapsuler type/valeur/source/validité (non encore branché au flux UI).
+- `app/src/main/res/layout/activity_main.xml`
+  - Contient `PreviewView`, overlay `scan_overlay`, et panneau de résultats.
+- `app/src/main/AndroidManifest.xml`
+  - Permission `CAMERA`, meta-data ML Kit pour le téléchargement auto du modèle.
 
-## 🚀 Plan d'Implémentation (3 Phases)
+## Prérequis
+- Android Studio récent (Giraffe/Koala/Iguana ou supérieur)
+- Android SDK `compileSdk=34`, `targetSdk=34`
+- JDK 17 recommandé
+- Un appareil Android (ou émulateur avec caméra virtuelle)
 
-### Phase 1 : Décodage Standard MLKit
-- ✅ Configuration MLKit dans l'app Android
-- ✅ Interface de scan basique avec caméra
-- ✅ Décodage des codes-barres standards (QR, Code128, etc.)
-- ✅ Validation du fonctionnement de base
+## Installation
+1. Cloner le repo dans votre environnement de dev.
+2. Ouvrir le dossier `MSIDecoder/` dans Android Studio.
+3. Laisser Android Studio synchroniser Gradle et télécharger les dépendances.
+4. Brancher un appareil (mode débogage USB activé) ou démarrer un émulateur.
+5. Lancer la configuration `app`.
 
-**Objectif :** S'assurer que la détection et le décodage fonctionnent correctement avec MLKit
+### Build en ligne de commande
+- Windows:
+  ```bat
+  gradlew.bat assembleDebug
+  ```
+- macOS/Linux:
+  ```bash
+  ./gradlew assembleDebug
+  ```
 
-### Phase 2 : Intégration ZXing pour Code39
-- ✅ Intégration de la librairie ZXing
-- ✅ Passerelle MLKit → ZXing pour images Code39
-- ✅ Décodage Code39 avec ZXing
-- ✅ Validation du pipeline hybride MLKit/ZXing
+## Exécution
+- Au premier lancement, l’app demande la **permission caméra**.
+- Cadrez le code-barres dans l’overlay: le type et la valeur s’affichent quand un code est détecté.
 
-**Objectif :** Valider que l'approche hybride fonctionne avec Code39 comme preuve de concept
+## Dépendances clés
+- CameraX:
+  - `androidx.camera:camera-core:1.3.1`
+  - `androidx.camera:camera-camera2:1.3.1`
+  - `androidx.camera:camera-lifecycle:1.3.1`
+  - `androidx.camera:camera-view:1.3.1`
+- ML Kit:
+  - `com.google.mlkit:barcode-scanning:17.2.0`
+- UI / AndroidX:
+  - `androidx.appcompat:appcompat:1.6.1`
+  - `com.google.android.material:material:1.11.0`
+  - `androidx.constraintlayout:constraintlayout:2.1.4`
 
-### Phase 3 : Décodeur MSI Personnalisé
-- ✅ Adaptation du `Code39Reader` de ZXing
-- ✅ Implémentation des patterns MSI
-- ✅ Support des checksums MSI (Mod10, Mod11, etc.)
-- ✅ Intégration complète dans l'app
-
-**Objectif :** Créer un décodeur MSI fonctionnel basé sur l'architecture ZXing
-
-## 📋 Spécifications Techniques
-
-### Codes MSI vs Code39
-
-| Aspect | MSI (MSI Plessey) | Code39 |
-|--------|-------------------|--------|
-| **Caractères** | Numérique uniquement (0-9) | Alphanumérique (A-Z, 0-9, symboles) |
-| **Structure** | 4 barres + 4 espaces (8 éléments) | 5 barres + 4 espaces (9 éléments) |
-| **Start/Stop** | Symboles MSI dédiés | Astérisque (*) |
-| **Checksum** | Mod10/Mod11 (facultatif) | Mod43 (facultatif) |
-| **Encodage** | Binaire (barres=1, espaces=0) | Largeur (narrow/wide) |
-
-### Patterns MSI
-- **Format :** 1 bit préfixe + 4 bits données + 2 bits suffixes (0)
-- **Représentation :** 
-  - 0 bit = 1/3 barre + 2/3 espace
-  - 1 bit = 2/3 barre + 1/3 espace
-
-## 🛠️ Architecture Technique
-
+## Structure du projet (simplifiée)
 ```
-MSIDecoderApp/
-├── app/src/main/java/
-│   ├── scanner/
-│   │   ├── CameraActivity.java          # Interface scan caméra
-│   │   ├── MLKitBarcodeScanner.java     # Wrapper MLKit
-│   │   └── BarcodeProcessor.java        # Traitement résultats
-│   ├── decoder/
-│   │   ├── ZXingIntegration.java        # Bridge MLKit→ZXing
-│   │   ├── Code39Decoder.java           # Décodeur Code39 (Phase 2)
-│   │   └── MSIDecoder.java              # Décodeur MSI (Phase 3)
-│   ├── models/
-│   │   ├── BarcodeResult.java           # Résultat de décodage
-│   │   └── MSIChecksum.java             # Algorithmes checksum
-│   └── utils/
-│       ├── PatternUtils.java            # Utilitaires patterns
-│       └── ImageProcessor.java          # Traitement d'images
-└── build.gradle                         # Dépendances projet
+MSIDecoder/
+  app/
+    src/main/
+      java/com/example/msidecoder/
+        MainActivity.java
+        scanner/
+          BarcodeAnalyzer.java
+          BarcodeResultListener.java
+        models/
+          BarcodeResult.java
+      res/
+        layout/activity_main.xml
+        drawable/scan_overlay.xml
+        values/{strings.xml, colors.xml, themes.xml}
+      AndroidManifest.xml
+    build.gradle
+  build.gradle
+  settings.gradle
+  DOCS/lecture_msi_fines_band.md
 ```
 
-## 📚 Ressources de Référence
+## Notes sur MSI
+- La documentation de lecture/validation MSI est fournie dans `DOCS/lecture_msi_fines_band.md`.
+- Points clés:
+  - Découpage en « fines bandes » (noir=1, blanc=0), start=`110`, stop=`1001`.
+  - Chiffres codés sur 12 bits; check digit (mod 10 ou 11/10) selon le contexte.
+  - Contexte Pharmony: seuls les 7 premiers chiffres sont utilisés pour l’identification.
+- Évolution prévue: ajouter une « Phase 2 » de décodage MSI spécifique après la détection ML Kit (validation + normalisation).
 
-### Documentation ZXing
-- **Code39Reader :** `https://github.com/zxing/zxing/blob/master/core/src/main/java/com/google/zxing/oned/Code39Reader.java`
-- **Patterns Code39 :** CHARACTER_ENCODINGS, recordPattern(), toNarrowWidePattern()
+## Dépannage
+- « Permission caméra requise »: accepter la permission dans le dialogue système ou via les paramètres.
+- ML Kit ne détecte rien:
+  - Vérifier la luminosité et la mise au point.
+  - Laisser le temps au téléchargement auto du modèle ML Kit (premier lancement).
+  - Essayer avec un autre format supporté (EAN-13, Code 128, etc.).
+- Crash ou build AGP/JDK:
+  - Utiliser JDK 17.
+  - Nettoyer/rebuild: `./gradlew clean assembleDebug`.
 
-### Implémentation MSI Existante
-- **MSI Java :** `https://github.com/barnhill/barcode-java/blob/main/src/main/java/com/pnuema/java/barcode/symbologies/MSI.java`
-- **Patterns MSI :** {"100100100100", "100100100110", "100100110100"...}
+## Licence
+À définir.
 
-### Algorithmes Checksum MSI
-1. **Mod 10** (Luhn) - Le plus courant
-2. **Mod 11 IBM** - Pondération (2,3,4,5,6,7)
-3. **Double checksum** - Mod10+Mod10 ou Mod11+Mod10
-
-## 🚦 États d'Avancement
-
-- [ ] **Phase 1** - Configuration MLKit et scan de base
-- [ ] **Phase 2** - Intégration ZXing pour Code39
-- [ ] **Phase 3** - Développement décodeur MSI personnalisé
-
-## 🔧 Prérequis
-
-- Android Studio installé
-- API Level minimum : 21 (Android 5.0)
-- Permissions caméra
-- Dépendances :
-  - `com.google.mlkit:barcode-scanning`
-  - `com.journeyapps:zxing-android-embedded`
-
-## 🎯 Cas d'Usage
-
-Application destinée au secteur pharmaceutique belge pour le décodage de codes MSI sur les médicaments et dispositifs médicaux.
-
----
-
-*Projet développé en collaboration avec Claude Code pour l'adaptation d'algorithmes de décodage de codes-barres.*
+## Crédits
+- CameraX par AndroidX
+- Barcode Scanning par Google ML Kit
