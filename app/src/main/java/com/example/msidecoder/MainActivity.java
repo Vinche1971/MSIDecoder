@@ -155,5 +155,8 @@ public class MainActivity extends AppCompatActivity implements BarcodeResultList
         if (executor != null) {
             executor.shutdown();
         }
+        if (barcodeAnalyzer != null) {
+            barcodeAnalyzer.close();
+        }
     }
 }
